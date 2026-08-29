@@ -6,8 +6,15 @@ import { BirthProfileForm } from "./features/birth-profile/BirthProfileForm";
 import { calculateReport } from "./features/guna-calculator/useCalculator";
 import { MatchResult } from "./features/match-result/MatchResult";
 import { SavedMatches } from "./features/match-result/SavedMatches";
-import { clearStoredData, loadStoredData, saveStoredData } from "./storage/profiles";
-import type { BirthDetails, MatchReport, StoredData } from "./types";
+import {
+  clearPinnedProfile,
+  clearStoredData,
+  loadPinnedProfile,
+  loadStoredData,
+  savePinnedProfile,
+  saveStoredData
+} from "./storage/profiles";
+import type { BirthDetails, MatchReport, ProfileRole, StoredData } from "./types";
 
 function createProfile(id: string, name = ""): BirthDetails {
   return {
@@ -24,11 +31,19 @@ function createProfile(id: string, name = ""): BirthDetails {
 
 export default function App() {
   const stored = useMemo(() => loadStoredData(), []);
+  const initialPinned = useMemo(() => loadPinnedProfile(), []);
   const [personA, setPersonA] = useState<BirthDetails>(
-    stored.personA ?? createProfile("person-a")
+    initialPinned?.role === "boy"
+      ? { ...initialPinned.details, id: "boy" }
+      : stored.personA ?? createProfile("boy")
   );
   const [personB, setPersonB] = useState<BirthDetails>(
-    stored.personB ?? createProfile("person-b")
+    initialPinned?.role === "girl"
+      ? { ...initialPinned.details, id: "girl" }
+      : stored.personB ?? createProfile("girl")
+  );
+  const [pinnedRole, setPinnedRole] = useState<ProfileRole | null>(
+    initialPinned?.role ?? null
   );
   const [remember, setRemember] = useState(stored.remember);
   const [matches, setMatches] = useState<MatchReport[]>(stored.previousMatches);
@@ -51,6 +66,19 @@ export default function App() {
     saveStoredData(data);
   }, [matches, personA, personB, remember]);
 
+  useEffect(() => {
+    if (!pinnedRole) {
+      clearPinnedProfile();
+      return;
+    }
+
+    savePinnedProfile({
+      version: 1,
+      role: pinnedRole,
+      details: pinnedRole === "boy" ? personA : personB
+    });
+  }, [personA, personB, pinnedRole]);
+
   function handleCalculate() {
     try {
       setError("");
@@ -70,16 +98,22 @@ export default function App() {
 
   function handleClear() {
     clearStoredData();
+    clearPinnedProfile();
+    setPinnedRole(null);
     setRemember(false);
     setMatches([]);
     setReport(null);
   }
 
   function handleReset() {
-    setPersonA(createProfile("person-a"));
-    setPersonB(createProfile("person-b"));
+    if (pinnedRole !== "boy") setPersonA(createProfile("boy"));
+    if (pinnedRole !== "girl") setPersonB(createProfile("girl"));
     setError("");
     setReport(null);
+  }
+
+  function handlePinToggle(role: ProfileRole) {
+    setPinnedRole((current) => (current === role ? null : role));
   }
 
   return (
@@ -129,8 +163,20 @@ export default function App() {
         </div>
 
         <div className="profile-grid">
-          <BirthProfileForm title="Person 1" value={personA} onChange={setPersonA} />
-          <BirthProfileForm title="Person 2" value={personB} onChange={setPersonB} />
+          <BirthProfileForm
+            title="Boy"
+            value={personA}
+            onChange={setPersonA}
+            isPinned={pinnedRole === "boy"}
+            onPinToggle={() => handlePinToggle("boy")}
+          />
+          <BirthProfileForm
+            title="Girl"
+            value={personB}
+            onChange={setPersonB}
+            isPinned={pinnedRole === "girl"}
+            onPinToggle={() => handlePinToggle("girl")}
+          />
         </div>
 
         <div className="action-bar">

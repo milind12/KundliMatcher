@@ -1,15 +1,25 @@
-import { MapPin } from "lucide-react";
+import { MapPin, Pin } from "lucide-react";
 import { useMemo } from "react";
 import { findCity, searchCities } from "../../data/cities";
+import { BiodataImport } from "../biodata/BiodataImport";
+import type { ParsedBiodata } from "../biodata/biodataParser";
 import type { BirthDetails } from "../../types";
 
 interface BirthProfileFormProps {
   title: string;
   value: BirthDetails;
   onChange: (value: BirthDetails) => void;
+  isPinned: boolean;
+  onPinToggle: () => void;
 }
 
-export function BirthProfileForm({ title, value, onChange }: BirthProfileFormProps) {
+export function BirthProfileForm({
+  title,
+  value,
+  onChange,
+  isPinned,
+  onPinToggle
+}: BirthProfileFormProps) {
   const cityListId = `${value.id}-city-options`;
   const citySuggestions = useMemo(() => searchCities(value.place), [value.place]);
 
@@ -33,6 +43,20 @@ export function BirthProfileForm({ title, value, onChange }: BirthProfileFormPro
     update("place", place);
   }
 
+  function handleBiodataApply(details: ParsedBiodata) {
+    const city = findCity(details.place);
+    onChange({
+      ...value,
+      name: details.name || value.name,
+      date: details.date || value.date,
+      time: details.time || value.time,
+      place: details.place ? city?.label ?? details.place : value.place,
+      latitude: city?.latitude ?? value.latitude,
+      longitude: city?.longitude ?? value.longitude,
+      timezone: city?.timezone ?? value.timezone
+    });
+  }
+
   return (
     <section className="panel profile-panel" aria-labelledby={`${value.id}-title`}>
       <div className="panel-heading">
@@ -41,6 +65,19 @@ export function BirthProfileForm({ title, value, onChange }: BirthProfileFormPro
           <h2 id={`${value.id}-title`}>{title}</h2>
         </div>
         <MapPin aria-hidden="true" size={22} />
+      </div>
+
+      <div className="profile-toolbar">
+        <button
+          aria-pressed={isPinned}
+          className={`ghost-button profile-tool-button${isPinned ? " is-active" : ""}`}
+          type="button"
+          onClick={onPinToggle}
+        >
+          <Pin aria-hidden="true" size={17} />
+          {isPinned ? `${title} saved` : `Keep ${title} on device`}
+        </button>
+        <BiodataImport profileTitle={title} onApply={handleBiodataApply} />
       </div>
 
       <div className="field-grid">

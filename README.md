@@ -6,6 +6,8 @@ React, TypeScript and Vite.
 ## What it includes
 
 - Browser-only birth profile entry with optional local storage.
+- One explicitly pinned Boy or Girl profile that survives reloads independently.
+- Local biodata import for text PDFs, scanned PDFs and image files with a review step.
 - Offline birthplace search covering more than 6,000 Indian cities and towns.
 - Sidereal Moon, Nakshatra and Rashi calculation using a Lahiri ayanamsha approximation.
 - Separate Ashtakoota modules for Varna, Vashya, Tara, Yoni, Graha Maitri, Gana, Bhakoot and Nadi.
@@ -37,6 +39,15 @@ Replace `https://example.com/` in `index.html`, `public/robots.txt` and
 
 The app has no backend. Birth details are calculated in the browser and are saved
 only to `localStorage` when "Remember profiles and matches" is enabled.
+Pinned profiles are also stored only in that browser. Uploaded biodata files are
+processed in memory and are not stored or sent to an application server.
+
+## Biodata import
+
+PDF.js reads selectable text from PDFs. Images and scanned PDFs use Tesseract.js
+English OCR in a browser worker; its OCR model may be downloaded and cached on
+first use, but the biodata image remains local. Imports are limited to 15 MB and
+the first four PDF pages, and extracted values must be reviewed before use.
 
 ## City data
 

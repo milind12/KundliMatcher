@@ -16,8 +16,10 @@
   "dependencies": {
     "@vitejs/plugin-react": "latest",
     "lucide-react": "latest",
+    "pdfjs-dist": "^6.2.108",
     "react": "latest",
     "react-dom": "latest",
+    "tesseract.js": "^7.0.0",
     "vite": "latest",
     "vite-plugin-pwa": "latest",
     "zod": "latest"
@@ -36,8 +38,8 @@
     "eslint-plugin-react-hooks": "latest",
     "eslint-plugin-react-refresh": "latest",
     "jsdom": "latest",
-    "typescript-eslint": "latest",
     "typescript": "latest",
+    "typescript-eslint": "latest",
     "vitest": "latest"
   }
 }

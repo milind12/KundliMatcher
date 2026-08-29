@@ -16,7 +16,8 @@ export function PrivacyPanel({ remember, onRememberChange, onClear }: PrivacyPan
           <h2 id="privacy-title">Birth details stay on this device</h2>
           <p>
             No account, backend or database is used. Saved profiles and previous matches
-            are kept in local browser storage only.
+            are kept in local browser storage only. Imported biodata files are processed
+            in your browser and discarded after extraction.
           </p>
         </div>
       </div>

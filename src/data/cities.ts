@@ -70,6 +70,10 @@ function countryOnlyLabel(city: CityOption): string | undefined {
   return city.label.endsWith(", India") ? `${city.name}, India` : undefined;
 }
 
+function stateLabel(city: CityOption): string | undefined {
+  return city.label.endsWith(", India") ? city.label.slice(0, -", India".length) : undefined;
+}
+
 export function findCity(place: string): CityOption | undefined {
   const query = normalize(place);
   if (!query) return undefined;
@@ -81,6 +85,11 @@ export function findCity(place: string): CityOption | undefined {
     (city) => normalize(countryOnlyLabel(city) ?? "") === query
   );
   if (countryOnlyMatch) return countryOnlyMatch;
+
+  const stateMatch = CITY_OPTIONS.find(
+    (city) => normalize(stateLabel(city) ?? "") === query
+  );
+  if (stateMatch) return stateMatch;
 
   return CITY_OPTIONS
     .filter((city) => normalize(city.name) === query)

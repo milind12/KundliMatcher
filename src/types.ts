@@ -19,6 +19,14 @@ export interface BirthDetails {
   timezone: string;
 }
 
+export type ProfileRole = "boy" | "girl";
+
+export interface PinnedProfile {
+  version: 1;
+  role: ProfileRole;
+  details: BirthDetails;
+}
+
 export interface BirthChart {
   details: BirthDetails;
   moonLongitude: number;
