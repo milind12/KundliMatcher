@@ -64,4 +64,14 @@ describe("biodata parser", () => {
       place: "Godhra, Gujarat"
     });
   });
+
+  it("defaults missing birth time to 12 PM", () => {
+    const result = parseBiodataText(`
+      Name: Neha Shah
+      Date of Birth: 21/09/1994
+      Place of Birth: Mumbai, Maharashtra
+    `);
+
+    expect(result.time).toBe("12:00");
+  });
 });

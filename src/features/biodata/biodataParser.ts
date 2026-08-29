@@ -49,6 +49,7 @@ const NAME_LABELS = [
   "girl(?:'s)?\\s+name",
   "name"
 ];
+const DEFAULT_BIRTH_TIME = "12:00";
 const STRUCTURAL_LABELS = [
   ...NAME_LABELS,
   ...DATE_LABELS,
@@ -224,7 +225,8 @@ export function parseBiodataText(input: string): ParsedBiodata {
     );
   const time =
     labeledTime ||
-    uniqueFallback(rawText, parseTime, /\b\d{1,2}\s*[:.]\s*\d{2}\s*(?:[ap]\.?\s*m\.?)?\b/gi);
+    uniqueFallback(rawText, parseTime, /\b\d{1,2}\s*[:.]\s*\d{2}\s*(?:[ap]\.?\s*m\.?)?\b/gi) ||
+    DEFAULT_BIRTH_TIME;
 
   return {
     name: cleanField(labeledValue(rawText, NAME_LABELS)),
