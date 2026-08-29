@@ -1,0 +1,17 @@
+{
+  "name": "Kundli Matching and 36 Guna Milan Calculator",
+  "short_name": "Guna Milan",
+  "description": "Private client-side Kundli matching and Ashtakoota Guna Milan calculator.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#fffaf4",
+  "theme_color": "#f8f1e7",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
