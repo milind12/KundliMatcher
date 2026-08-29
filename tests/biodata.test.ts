@@ -34,4 +34,34 @@ describe("biodata parser", () => {
       place: "Surat"
     });
   });
+
+  it("aligns labels and values extracted as separate PDF columns", () => {
+    const result = parseBiodataText(`
+      Name
+      Age
+      Date of Birth
+      Height
+      Weight
+      Location
+      Birth Time
+      Hobbies
+      Caste
+      Tanvi Patel
+      26 years
+      13 June 2000
+      5'2"
+      48 kg
+      Godhra, Gujarat
+      06:20 PM
+      Reading
+      Patel
+    `);
+
+    expect(result).toMatchObject({
+      name: "Tanvi Patel",
+      date: "2000-06-13",
+      time: "18:20",
+      place: "Godhra, Gujarat"
+    });
+  });
 });

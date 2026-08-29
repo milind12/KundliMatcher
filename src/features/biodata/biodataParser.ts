@@ -39,7 +39,8 @@ const PLACE_LABELS = [
   "place\\s+of\\s+birth",
   "birth\\s*place",
   "birthplace",
-  "birth\\s+city"
+  "birth\\s+city",
+  "location"
 ];
 const NAME_LABELS = [
   "full\\s+name",
@@ -48,6 +49,44 @@ const NAME_LABELS = [
   "girl(?:'s)?\\s+name",
   "name"
 ];
+const STRUCTURAL_LABELS = [
+  ...NAME_LABELS,
+  ...DATE_LABELS,
+  ...TIME_LABELS,
+  ...PLACE_LABELS,
+  "age",
+  "height",
+  "weight",
+  "religion",
+  "caste",
+  "sub[ -]?caste",
+  "gotra",
+  "manglik",
+  "marital\\s+status",
+  "education",
+  "qualification",
+  "occupation",
+  "profession",
+  "income",
+  "company",
+  "hobbies",
+  "father(?:'s)?\\s+name",
+  "mother(?:'s)?\\s+name",
+  "family",
+  "address",
+  "contact",
+  "phone",
+  "mobile"
+];
+
+const STRUCTURAL_LABEL_PATTERN = new RegExp(
+  `^(?:${STRUCTURAL_LABELS.join("|")})\\s*(?::|[-–—])?\\s*$`,
+  "i"
+);
+
+function isStructuralLabel(value: string): boolean {
+  return STRUCTURAL_LABEL_PATTERN.test(value.trim());
+}
 
 function cleanText(text: string): string {
   return text
@@ -67,8 +106,24 @@ function labeledValue(text: string, labels: string[]): string {
     if (!match) continue;
 
     const sameLine = match[1]?.trim();
-    if (sameLine) return sameLine;
-    return lines[index + 1]?.trim() ?? "";
+    if (sameLine && !isStructuralLabel(sameLine)) return sameLine;
+
+    const nextLine = lines[index + 1]?.trim() ?? "";
+    if (nextLine && !isStructuralLabel(nextLine)) return nextLine;
+
+    let labelBlockStart = index;
+    while (labelBlockStart > 0 && isStructuralLabel(lines[labelBlockStart - 1])) {
+      labelBlockStart -= 1;
+    }
+
+    let labelBlockEnd = index;
+    while (labelBlockEnd + 1 < lines.length && isStructuralLabel(lines[labelBlockEnd + 1])) {
+      labelBlockEnd += 1;
+    }
+
+    const valueIndex = labelBlockEnd + 1 + (index - labelBlockStart);
+    const alignedValue = lines[valueIndex]?.trim() ?? "";
+    if (alignedValue && !isStructuralLabel(alignedValue)) return alignedValue;
   }
 
   const inlinePattern = new RegExp(
@@ -103,7 +158,7 @@ function parseDate(value: string): string {
   if (numeric) return toIsoDate(Number(numeric[1]), Number(numeric[2]), Number(numeric[3]));
 
   const dayFirst = value.match(
-    /\b(\d{1,2})(?:st|nd|rd|th)?\s+([a-z]{3,9})[,]?\s+(\d{2,4})\b/i
+    /\b(\d{1,2})(?:st|nd|rd|th)?\s*[-./]?\s*([a-z]{3,9})[,]?\s*[-./]?\s*(\d{2,4})\b/i
   );
   if (dayFirst) {
     return toIsoDate(
@@ -114,7 +169,7 @@ function parseDate(value: string): string {
   }
 
   const monthFirst = value.match(
-    /\b([a-z]{3,9})\s+(\d{1,2})(?:st|nd|rd|th)?[,]?\s+(\d{2,4})\b/i
+    /\b([a-z]{3,9})\s*[-./]?\s*(\d{1,2})(?:st|nd|rd|th)?[,]?\s*[-./]?\s*(\d{2,4})\b/i
   );
   if (monthFirst) {
     return toIsoDate(
@@ -165,11 +220,11 @@ export function parseBiodataText(input: string): ParsedBiodata {
     uniqueFallback(
       rawText,
       parseDate,
-      /\b(?:\d{1,2}\s*[./-]\s*\d{1,2}\s*[./-]\s*\d{2,4}|\d{1,2}(?:st|nd|rd|th)?\s+[a-z]{3,9}[,]?\s+\d{2,4}|[a-z]{3,9}\s+\d{1,2}(?:st|nd|rd|th)?[,]?\s+\d{2,4})\b/gi
+      /\b(?:\d{1,2}\s*[./-]\s*\d{1,2}\s*[./-]\s*\d{2,4}|\d{1,2}(?:st|nd|rd|th)?\s*[-./]?\s*[a-z]{3,9}[,]?\s*[-./]?\s*\d{2,4}|[a-z]{3,9}\s*[-./]?\s*\d{1,2}(?:st|nd|rd|th)?[,]?\s*[-./]?\s*\d{2,4})\b/gi
     );
   const time =
     labeledTime ||
-    uniqueFallback(rawText, parseTime, /\b\d{1,2}\s*[:.]\s*\d{2}\s*(?:[ap]\.?m\.?)?\b/gi);
+    uniqueFallback(rawText, parseTime, /\b\d{1,2}\s*[:.]\s*\d{2}\s*(?:[ap]\.?\s*m\.?)?\b/gi);
 
   return {
     name: cleanField(labeledValue(rawText, NAME_LABELS)),

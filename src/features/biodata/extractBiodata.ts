@@ -43,9 +43,7 @@ async function extractImage(file: File, onProgress: ExtractionProgress): Promise
 }
 
 function textItemsToLines(items: Array<unknown>): string {
-  const lines: string[] = [];
-  let currentLine = "";
-  let previousY: number | null = null;
+  const rows: Array<{ y: number; items: Array<{ x: number; text: string }> }> = [];
 
   for (const item of items) {
     if (!item || typeof item !== "object" || !("str" in item) || !("transform" in item)) {
@@ -53,18 +51,28 @@ function textItemsToLines(items: Array<unknown>): string {
     }
 
     const textItem = item as { str: string; transform: number[] };
-    const y = textItem.transform[5] ?? 0;
-    if (previousY !== null && Math.abs(y - previousY) > 2 && currentLine.trim()) {
-      lines.push(currentLine.trim());
-      currentLine = "";
-    }
+    const text = textItem.str.trim();
+    if (!text) continue;
 
-    currentLine += `${currentLine ? " " : ""}${textItem.str}`;
-    previousY = y;
+    const x = textItem.transform[4] ?? 0;
+    const y = textItem.transform[5] ?? 0;
+    let row = rows.find((candidate) => Math.abs(candidate.y - y) <= 3);
+    if (!row) {
+      row = { y, items: [] };
+      rows.push(row);
+    }
+    row.items.push({ x, text });
   }
 
-  if (currentLine.trim()) lines.push(currentLine.trim());
-  return lines.join("\n");
+  return rows
+    .sort((a, b) => b.y - a.y)
+    .map((row) =>
+      row.items
+        .sort((a, b) => a.x - b.x)
+        .map((item) => item.text)
+        .join(" ")
+    )
+    .join("\n");
 }
 
 async function extractPdf(file: File, onProgress: ExtractionProgress): Promise<string> {
