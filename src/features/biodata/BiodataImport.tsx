@@ -2,6 +2,7 @@ import { FileCheck2, LoaderCircle, Upload, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { CityAutocomplete } from "../../components/CityAutocomplete";
 import { findCity } from "../../data/cities";
+import { recoverFromStaleBuild } from "../../utils/staleBuild";
 import { parseBiodataText, type ParsedBiodata } from "./biodataParser";
 import { extractBiodataText } from "./extractBiodata";
 
@@ -131,18 +132,23 @@ export function BiodataImport({ profileTitle, onApply }: BiodataImportProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [progress, setProgress] = useState("");
   const [error, setError] = useState("");
+  const [needsRefresh, setNeedsRefresh] = useState(false);
   const [review, setReview] = useState<ParsedBiodata | null>(null);
 
   async function handleFile(file: File) {
     setError("");
+    setNeedsRefresh(false);
     setProgress("Opening biodata");
 
     try {
       const text = await extractBiodataText(file, setProgress);
       setReview(parseBiodataText(text));
     } catch (unknownError) {
+      const staleBuildMessage = await recoverFromStaleBuild(unknownError);
+      setNeedsRefresh(Boolean(staleBuildMessage));
       setError(
-        unknownError instanceof Error ? unknownError.message : "The biodata could not be read."
+        staleBuildMessage ??
+          (unknownError instanceof Error ? unknownError.message : "The biodata could not be read.")
       );
     } finally {
       setProgress("");
@@ -175,7 +181,20 @@ export function BiodataImport({ profileTitle, onApply }: BiodataImportProps) {
         )}
         {progress || "Import biodata"}
       </button>
-      {error ? <p className="import-error" role="alert">{error}</p> : null}
+      {error ? (
+        <div className="import-recovery" role="alert">
+          <p className="import-error">{error}</p>
+          {needsRefresh ? (
+            <button
+              className="ghost-button profile-tool-button"
+              type="button"
+              onClick={() => window.location.reload()}
+            >
+              Refresh page
+            </button>
+          ) : null}
+        </div>
+      ) : null}
       {review ? (
         <ReviewDialog
           initial={review}

@@ -326,6 +326,12 @@ main {
   gap: 6px;
 }
 
+.import-recovery {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+}
+
 .import-error {
   max-width: 250px;
   margin: 0;
