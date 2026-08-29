@@ -1,4 +1,4 @@
-import { Calculator, Github, RotateCcw, Sparkles } from "lucide-react";
+import { Calculator, ExternalLink, RotateCcw, Sparkles } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { ZodError } from "zod";
 import { PrivacyPanel } from "./components/PrivacyPanel";
@@ -91,7 +91,7 @@ export default function App() {
           <a href="#privacy">Privacy</a>
         </nav>
         <a className="header-link" href="https://github.com/" rel="noreferrer">
-          <Github aria-hidden="true" size={18} />
+          <ExternalLink aria-hidden="true" size={18} />
           GitHub Pages ready
         </a>
       </header>
