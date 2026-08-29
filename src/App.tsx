@@ -15,7 +15,7 @@ function createProfile(id: string, name = ""): BirthDetails {
     name,
     date: "",
     time: "",
-    place: "Mumbai, India",
+    place: "Mumbai, Maharashtra, India",
     latitude: 19.076,
     longitude: 72.8777,
     timezone: "+05:30"
@@ -174,6 +174,14 @@ export default function App() {
           </p>
         </div>
       </section>
+
+      <footer className="site-footer">
+        City data from{" "}
+        <a href="https://www.geonames.org/" rel="noreferrer" target="_blank">
+          GeoNames
+        </a>{" "}
+        under CC BY 4.0.
+      </footer>
     </main>
   );
 }

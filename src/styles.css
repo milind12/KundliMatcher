@@ -477,6 +477,13 @@ summary:focus-visible {
   line-height: 1.7;
 }
 
+.site-footer {
+  padding: 2px 0 32px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-align: center;
+}
+
 @media (max-width: 820px) {
   main {
     width: min(100% - 22px, 1180px);

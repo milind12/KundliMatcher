@@ -6,6 +6,7 @@ React, TypeScript and Vite.
 ## What it includes
 
 - Browser-only birth profile entry with optional local storage.
+- Offline birthplace search covering more than 6,000 Indian cities and towns.
 - Sidereal Moon, Nakshatra and Rashi calculation using a Lahiri ayanamsha approximation.
 - Separate Ashtakoota modules for Varna, Vashya, Tara, Yoni, Graha Maitri, Gana, Bhakoot and Nadi.
 - Expandable result explanations and previous match history.
@@ -36,6 +37,12 @@ Replace `https://example.com/` in `index.html`, `public/robots.txt` and
 
 The app has no backend. Birth details are calculated in the browser and are saved
 only to `localStorage` when "Remember profiles and matches" is enabled.
+
+## City data
+
+Indian city names and coordinates are derived from the GeoNames `cities5000` and
+`admin1CodesASCII` datasets, licensed under CC BY 4.0. Regenerate the bundled
+offline index with `npm run cities:generate`.
 
 ## Accuracy note
 

@@ -1,5 +1,6 @@
 import { MapPin } from "lucide-react";
-import { CITY_OPTIONS } from "../../data/cities";
+import { useMemo } from "react";
+import { findCity, searchCities } from "../../data/cities";
 import type { BirthDetails } from "../../types";
 
 interface BirthProfileFormProps {
@@ -10,13 +11,14 @@ interface BirthProfileFormProps {
 
 export function BirthProfileForm({ title, value, onChange }: BirthProfileFormProps) {
   const cityListId = `${value.id}-city-options`;
+  const citySuggestions = useMemo(() => searchCities(value.place), [value.place]);
 
   function update<K extends keyof BirthDetails>(key: K, next: BirthDetails[K]) {
     onChange({ ...value, [key]: next });
   }
 
   function handlePlaceChange(place: string) {
-    const city = CITY_OPTIONS.find((option) => option.label === place);
+    const city = findCity(place);
     if (city) {
       onChange({
         ...value,
@@ -118,7 +120,7 @@ export function BirthProfileForm({ title, value, onChange }: BirthProfileFormPro
       </div>
 
       <datalist id={cityListId}>
-        {CITY_OPTIONS.map((city) => (
+        {citySuggestions.map((city) => (
           <option key={city.label} value={city.label} />
         ))}
       </datalist>
