@@ -211,8 +211,30 @@ function cleanField(value: string): string {
     .trim();
 }
 
+function firstNameFallback(text: string): string {
+  const headingPattern = /^(?:marriage|matrimonial|personal)?\s*(?:bio\s*data|biodata|profile|personal details)$/i;
+  const namePattern = /^(?:[a-z]+(?:[.'’-][a-z]+)*)(?:\s+[a-z]+(?:[.'’-][a-z]+)*){1,5}$/i;
+
+  for (const line of text.split("\n")) {
+    const candidate = cleanField(line);
+    if (
+      !candidate ||
+      isStructuralLabel(candidate) ||
+      headingPattern.test(candidate) ||
+      /[:|@/\\]|\d/.test(candidate)
+    ) {
+      continue;
+    }
+
+    if (namePattern.test(candidate)) return candidate;
+  }
+
+  return "";
+}
+
 export function parseBiodataText(input: string): ParsedBiodata {
   const rawText = cleanText(input);
+  const labeledName = cleanField(labeledValue(rawText, NAME_LABELS));
   const labeledDate = parseDate(labeledValue(rawText, DATE_LABELS));
   const labeledTime = parseTime(labeledValue(rawText, TIME_LABELS));
 
@@ -229,7 +251,7 @@ export function parseBiodataText(input: string): ParsedBiodata {
     DEFAULT_BIRTH_TIME;
 
   return {
-    name: cleanField(labeledValue(rawText, NAME_LABELS)),
+    name: labeledName || firstNameFallback(rawText),
     date,
     time,
     place: cleanField(labeledValue(rawText, PLACE_LABELS)),

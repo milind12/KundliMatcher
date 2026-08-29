@@ -74,4 +74,25 @@ describe("biodata parser", () => {
 
     expect(result.time).toBe("12:00");
   });
+
+  it("uses the first name-like line when the name has no label", () => {
+    const result = parseBiodataText(`
+      Krishna Dharmendra Mehta
+      Date of Birth: 22-07-1998
+      Birth Place: Ahmedabad
+      Caste: Vaishnav Vaniya
+    `);
+
+    expect(result.name).toBe("Krishna Dharmendra Mehta");
+  });
+
+  it("skips biodata headings when finding an unlabeled name", () => {
+    const result = parseBiodataText(`
+      MARRIAGE BIODATA
+      Riya Sanjay Patel
+      Date of Birth: 05-11-1997
+    `);
+
+    expect(result.name).toBe("Riya Sanjay Patel");
+  });
 });
