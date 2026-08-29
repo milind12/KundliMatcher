@@ -1,6 +1,7 @@
 import { FileCheck2, LoaderCircle, Upload, X } from "lucide-react";
-import { useEffect, useId, useMemo, useRef, useState } from "react";
-import { findCity, searchCities } from "../../data/cities";
+import { useEffect, useRef, useState } from "react";
+import { CityAutocomplete } from "../../components/CityAutocomplete";
+import { findCity } from "../../data/cities";
 import { parseBiodataText, type ParsedBiodata } from "./biodataParser";
 import { extractBiodataText } from "./extractBiodata";
 
@@ -22,8 +23,6 @@ function ReviewDialog({ initial, profileTitle, onApply, onClose }: ReviewDialogP
     const city = findCity(initial.place);
     return city ? { ...initial, place: city.label } : initial;
   });
-  const cityListId = useId();
-  const citySuggestions = useMemo(() => searchCities(draft.place), [draft.place]);
   const matchedCity = findCity(draft.place);
 
   useEffect(() => {
@@ -43,11 +42,6 @@ function ReviewDialog({ initial, profileTitle, onApply, onClose }: ReviewDialogP
 
   function update(key: keyof ParsedBiodata, value: string) {
     setDraft((current) => ({ ...current, [key]: value }));
-  }
-
-  function updatePlace(place: string) {
-    const city = findCity(place);
-    update("place", city?.label ?? place);
   }
 
   return (
@@ -93,21 +87,13 @@ function ReviewDialog({ initial, profileTitle, onApply, onClose }: ReviewDialogP
               onChange={(event) => update("time", event.target.value)}
             />
           </label>
-          <label className="review-place">
-            <span>Birthplace</span>
-            <input
-              list={cityListId}
-              value={draft.place}
-              onChange={(event) => updatePlace(event.target.value)}
-            />
-          </label>
+          <CityAutocomplete
+            label="Birthplace"
+            value={draft.place}
+            onValueChange={(place) => update("place", place)}
+            onCitySelect={(city) => update("place", city.label)}
+          />
         </div>
-
-        <datalist id={cityListId}>
-          {citySuggestions.map((city) => (
-            <option key={city.label} value={city.label} />
-          ))}
-        </datalist>
 
         <p className={matchedCity ? "location-match" : "location-match location-unmatched"}>
           {matchedCity

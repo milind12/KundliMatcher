@@ -49,14 +49,16 @@ test("keeps one pinned profile across reloads", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Boy saved" })).toBeVisible();
 });
 
-test("fills coordinates from the offline Rajkot city match", async ({ page }) => {
+test("opens city suggestions and fills Rajkot coordinates", async ({ page }) => {
   await page.goto("/");
 
-  await page.getByLabel("Birthplace").first().fill("Rajkot");
+  const birthplace = page.getByLabel("Birthplace").first();
+  await birthplace.click();
+  await expect(page.getByRole("listbox")).toBeVisible();
+  await birthplace.fill("Rajk");
+  await page.getByRole("option", { name: "Rajkot, Gujarat, India" }).click();
 
-  await expect(page.getByLabel("Birthplace").first()).toHaveValue(
-    "Rajkot, Gujarat, India"
-  );
+  await expect(birthplace).toHaveValue("Rajkot, Gujarat, India");
   await expect(page.getByLabel("Latitude").first()).toHaveValue("22.29161");
   await expect(page.getByLabel("Longitude").first()).toHaveValue("70.79322");
   await expect(page.getByLabel("Timezone").first()).toHaveValue("+05:30");

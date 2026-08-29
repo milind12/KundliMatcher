@@ -41,6 +41,64 @@ input {
   font: inherit;
 }
 
+.city-autocomplete {
+  position: relative;
+}
+
+.city-options {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 12;
+  max-height: 280px;
+  overflow-y: auto;
+  margin: 0;
+  border: 1px solid #d9c7b6;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 5px;
+  box-shadow: 0 16px 38px rgba(36, 25, 23, 0.18);
+  list-style: none;
+}
+
+.city-options li {
+  min-height: 42px;
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) 18px;
+  align-items: center;
+  gap: 8px;
+  border-radius: 6px;
+  padding: 7px 9px;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.city-options li.is-active,
+.city-options li:hover {
+  background: #f3e9df;
+}
+
+.city-options li svg {
+  color: var(--teal);
+}
+
+.city-options li span,
+.field-grid .city-options li span,
+.review-grid .city-options li span {
+  overflow-wrap: anywhere;
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.city-options .city-empty {
+  display: block;
+  color: var(--muted);
+  cursor: default;
+  font-size: 0.82rem;
+}
+
 button:disabled {
   cursor: wait;
   opacity: 0.7;
@@ -396,6 +454,10 @@ summary:focus-visible {
 }
 
 .review-place {
+  grid-column: 1 / -1;
+}
+
+.review-grid .city-autocomplete-field {
   grid-column: 1 / -1;
 }
 

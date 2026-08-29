@@ -1,6 +1,6 @@
 import { MapPin, Pin } from "lucide-react";
-import { useMemo } from "react";
-import { findCity, searchCities } from "../../data/cities";
+import { CityAutocomplete } from "../../components/CityAutocomplete";
+import { findCity, type CityOption } from "../../data/cities";
 import { BiodataImport } from "../biodata/BiodataImport";
 import type { ParsedBiodata } from "../biodata/biodataParser";
 import type { BirthDetails } from "../../types";
@@ -20,11 +20,18 @@ export function BirthProfileForm({
   isPinned,
   onPinToggle
 }: BirthProfileFormProps) {
-  const cityListId = `${value.id}-city-options`;
-  const citySuggestions = useMemo(() => searchCities(value.place), [value.place]);
-
   function update<K extends keyof BirthDetails>(key: K, next: BirthDetails[K]) {
     onChange({ ...value, [key]: next });
+  }
+
+  function handleCitySelect(city: CityOption) {
+    onChange({
+      ...value,
+      place: city.label,
+      latitude: city.latitude,
+      longitude: city.longitude,
+      timezone: city.timezone
+    });
   }
 
   function handlePlaceChange(place: string) {
@@ -111,16 +118,14 @@ export function BirthProfileForm({
           />
         </label>
 
-        <label>
-          <span>Birthplace</span>
-          <input
-            list={cityListId}
-            value={value.place}
-            onChange={(event) => handlePlaceChange(event.target.value)}
-            placeholder="City, country"
-            required
-          />
-        </label>
+        <CityAutocomplete
+          label="Birthplace"
+          value={value.place}
+          onValueChange={handlePlaceChange}
+          onCitySelect={handleCitySelect}
+          placeholder="City, country"
+          required
+        />
 
         <label>
           <span>Latitude</span>
@@ -156,11 +161,6 @@ export function BirthProfileForm({
         </label>
       </div>
 
-      <datalist id={cityListId}>
-        {citySuggestions.map((city) => (
-          <option key={city.label} value={city.label} />
-        ))}
-      </datalist>
     </section>
   );
 }
