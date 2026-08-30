@@ -35,6 +35,22 @@ describe("biodata parser", () => {
     });
   });
 
+  it("extracts City Of Birth from profile screenshots", () => {
+    const result = parseBiodataText(`
+      Astro Details
+      Sani/Mangal: NA
+      Date Of Birth: 18-Sep-1997
+      Time Of Birth: 1:44 AM
+      City Of Birth: Vadodara
+    `);
+
+    expect(result).toMatchObject({
+      date: "1997-09-18",
+      time: "01:44",
+      place: "Vadodara"
+    });
+  });
+
   it("aligns labels and values extracted as separate PDF columns", () => {
     const result = parseBiodataText(`
       Name

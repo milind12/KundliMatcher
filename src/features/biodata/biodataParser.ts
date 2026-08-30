@@ -39,6 +39,7 @@ const PLACE_LABELS = [
   "place\\s+of\\s+birth",
   "birth\\s*place",
   "birthplace",
+  "city\\s+of\\s+birth",
   "birth\\s+city",
   "location"
 ];

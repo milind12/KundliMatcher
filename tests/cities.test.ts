@@ -15,4 +15,13 @@ describe("offline city lookup", () => {
   it("ranks matching city names ahead of state-only matches", () => {
     expect(searchCities("rajkot")[0]?.label).toBe("Rajkot, Gujarat, India");
   });
+
+  it("resolves Vadodara from city of birth text", () => {
+    expect(findCity("Vadodara")).toMatchObject({
+      label: "Vadodara, Gujarat, India",
+      latitude: 22.29941,
+      longitude: 73.20812,
+      timezone: "+05:30"
+    });
+  });
 });
